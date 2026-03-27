@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rifa de Ana Beatriz</title>
+    <style>
+        :root {
+            --azul-fundo: #b5c6d3;
+            --turquesa: #5fc9c3;
+            --rosa-coracao: #f46b7a;
+            --cinza-borda: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--azul-fundo);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            max-width: 800px;
+            width: 100%;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            border: 8px solid var(--turquesa);
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Georgia', serif;
+            color: var(--rosa-coracao);
+            font-style: italic;
+            margin-bottom: 5px;
+        }
+
+        h2 {
+            text-transform: uppercase;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        /* Grade de Números */
+        .grade-rifa {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 5px;
+            margin-bottom: 30px;
+        }
+
+        .numero {
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            border-radius: 4px;
+        }
+
+        .numero:hover {
+            background-color: #f0f0f0;
+            border-color: var(--turquesa);
+        }
+
+        /* Estados dos Números */
+        .numero.selecionado {
+            background-color: var(--turquesa);
+            color: white;
+            border-color: #48a7a2;
+        }
+
+        .numero.pago {
+            background-color: #ddd;
+            color: #999;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+
+        /* Resumo e Botão */
+        .resumo {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 5px solid var(--rosa-coracao);
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .btn-comprar {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .btn-comprar:hover {
+            transform: scale(1.02);
+            background-color: #27ae60;
+        }
+
+        /* Responsividade para Celular */
+        @media (max-width: 600px) {
+            .grade-rifa {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Ana Beatriz</h1>
+    <h2>Os números disponíveis são:</h2>
+
+    <div class="grade-rifa" id="grade">
+        </div>
+
+    <div class="resumo">
+        <strong>Números selecionados:</strong> <span id="lista-selecionados">Nenhum</span><br>
+        <strong>Total:</strong> R$ <span id="valor-total">0,00</span>
+    </div>
+
+    <button class="btn-comprar" onclick="finalizarReserva()">Reservar Números via WhatsApp</button>
+</div>
+
+<script>
+    const precoPorNumero = 6.00; // Defina o valor aqui
+    const totalNumeros = 60;
+    const selecionados = new Set();
+    const jaPagos = []; // Exemplo de números já vendidos
+
+    const grade = document.getElementById('grade');
+    const listaTxt = document.getElementById('lista-selecionados');
+    const valorTxt = document.getElementById('valor-total');
+
+    // Gerar a grade de 1 a 60
+    for (let i = 1; i <= totalNumeros; i++) {
+        const div = document.createElement('div');
+        div.classList.add('numero');
+        div.innerText = i;
+
+        if (jaPagos.includes(i)) {
+            div.classList.add('pago');
+        } else {
+            div.onclick = () => alternarNumero(i, div);
+        }
+
+        grade.appendChild(div);
+    }
+
+    function alternarNumero(num, elemento) {
+        if (selecionados.has(num)) {
+            selecionados.delete(num);
+            elemento.classList.remove('selecionado');
+        } else {
+            selecionados.add(num);
+            elemento.classList.add('selecionado');
+        }
+        atualizarResumo();
+    }
+
+    function atualizarResumo() {
+        const arr = Array.from(selecionados).sort((a, b) => a - b);
+        listaTxt.innerText = arr.length > 0 ? arr.join(', ') : 'Nenhum';
+        valorTxt.innerText = (arr.length * precoPorNumero).toFixed(2).replace('.', ',');
+    }
+
+    function finalizarReserva() {
+        if (selecionados.size === 0) {
+            alert("Por favor, selecione pelo menos um número!");
+            return;
+        }
+        const numeros = Array.from(selecionados).join(', ');
+        const mensagem = `Olá! Gostaria de reservar os seguintes números da rifa de Autocuidado - Kit Macadâmia: ${numeros}`;
+        const fone = "5533999284404"; // COLOQUE SEU TELEFONE AQUI
+        window.open(`https://wa.me/${fone}?text=${encodeURIComponent(mensagem)}`);
+    }
+</script>
+
+</body>
+</html>
